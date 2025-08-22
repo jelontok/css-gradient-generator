@@ -54,6 +54,7 @@ class GradientGenerator {
     bindColorStopEvents() {
         const colorInputs = this.colorStops.querySelectorAll('.color-input');
         const positionSliders = this.colorStops.querySelectorAll('.position-slider');
+        const opacitySliders = this.colorStops.querySelectorAll('.opacity-slider');
         const removeButtons = this.colorStops.querySelectorAll('.remove-color');
         
         colorInputs.forEach(input => {
@@ -62,7 +63,17 @@ class GradientGenerator {
         
         positionSliders.forEach(slider => {
             slider.addEventListener('input', (e) => {
-                const display = e.target.nextElementSibling;
+                const colorStop = e.target.closest('.color-stop');
+                const display = colorStop.querySelector('.position-display');
+                display.textContent = e.target.value + '%';
+                this.updateGradient();
+            });
+        });
+        
+        opacitySliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const colorStop = e.target.closest('.color-stop');
+                const display = colorStop.querySelector('.opacity-display');
                 display.textContent = e.target.value + '%';
                 this.updateGradient();
             });
@@ -92,8 +103,16 @@ class GradientGenerator {
         
         colorStopDiv.innerHTML = `
             <input type="color" value="${randomColor}" class="color-input w-12 h-12 rounded border-2 border-gray-300 cursor-pointer">
-            <input type="range" min="0" max="100" value="${randomPosition}" class="position-slider flex-1 mx-3">
-            <span class="position-display w-12 text-sm text-gray-600">${randomPosition}%</span>
+            <div class="flex-1 mx-3">
+                <div class="text-xs text-gray-500 mb-1">Position</div>
+                <input type="range" min="0" max="100" value="${randomPosition}" class="position-slider w-full mb-1">
+                <div class="text-xs text-gray-500 mb-1">Opacity</div>
+                <input type="range" min="0" max="100" value="100" class="opacity-slider w-full">
+            </div>
+            <div class="w-16 text-sm text-gray-600">
+                <div class="position-display">${randomPosition}%</div>
+                <div class="opacity-display text-xs">100%</div>
+            </div>
             <button class="remove-color ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">×</button>
         `;
         
@@ -122,6 +141,13 @@ class GradientGenerator {
         return colors[Math.floor(Math.random() * colors.length)];
     }
     
+    hexToRgba(hex, alpha) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    
     getColorStops() {
         const stops = [];
         const colorStopElements = this.colorStops.querySelectorAll('.color-stop');
@@ -129,7 +155,8 @@ class GradientGenerator {
         colorStopElements.forEach(element => {
             const color = element.querySelector('.color-input').value;
             const position = element.querySelector('.position-slider').value;
-            stops.push({ color, position: parseInt(position) });
+            const opacity = element.querySelector('.opacity-slider').value;
+            stops.push({ color, position: parseInt(position), opacity: parseInt(opacity) });
         });
         
         // Sort stops by position
@@ -144,10 +171,16 @@ class GradientGenerator {
         let gradient;
         if (type === 'linear') {
             const dir = this.direction.value;
-            const stopStrings = stops.map(stop => `${stop.color} ${stop.position}%`);
+            const stopStrings = stops.map(stop => {
+                const rgba = this.hexToRgba(stop.color, stop.opacity / 100);
+                return `${rgba} ${stop.position}%`;
+            });
             gradient = `linear-gradient(${dir}, ${stopStrings.join(', ')})`;
         } else {
-            const stopStrings = stops.map(stop => `${stop.color} ${stop.position}%`);
+            const stopStrings = stops.map(stop => {
+                const rgba = this.hexToRgba(stop.color, stop.opacity / 100);
+                return `${rgba} ${stop.position}%`;
+            });
             gradient = `radial-gradient(circle, ${stopStrings.join(', ')})`;
         }
         
@@ -297,14 +330,22 @@ class GradientGenerator {
         this.updateGradient();
     }
     
-    createColorStop(color, position, isFirst = false) {
+    createColorStop(color, position, isFirst = false, opacity = 100) {
         const colorStopDiv = document.createElement('div');
         colorStopDiv.className = 'color-stop flex items-center mb-3';
         
         colorStopDiv.innerHTML = `
             <input type="color" value="${color}" class="color-input w-12 h-12 rounded border-2 border-gray-300 cursor-pointer">
-            <input type="range" min="0" max="100" value="${position}" class="position-slider flex-1 mx-3">
-            <span class="position-display w-12 text-sm text-gray-600">${position}%</span>
+            <div class="flex-1 mx-3">
+                <div class="text-xs text-gray-500 mb-1">Position</div>
+                <input type="range" min="0" max="100" value="${position}" class="position-slider w-full mb-1">
+                <div class="text-xs text-gray-500 mb-1">Opacity</div>
+                <input type="range" min="0" max="100" value="${opacity}" class="opacity-slider w-full">
+            </div>
+            <div class="w-16 text-sm text-gray-600">
+                <div class="position-display">${position}%</div>
+                <div class="opacity-display text-xs">${opacity}%</div>
+            </div>
             <button class="remove-color ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600${isFirst ? ' disabled:opacity-50' : ''}"${isFirst ? ' disabled' : ''}>×</button>
         `;
         

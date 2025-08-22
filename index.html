@@ -58,14 +58,30 @@
                     <div id="colorStops">
                         <div class="color-stop flex items-center mb-3">
                             <input type="color" value="#ff0000" class="color-input w-12 h-12 rounded border-2 border-gray-300 cursor-pointer">
-                            <input type="range" min="0" max="100" value="0" class="position-slider flex-1 mx-3">
-                            <span class="position-display w-12 text-sm text-gray-600">0%</span>
+                            <div class="flex-1 mx-3">
+                                <div class="text-xs text-gray-500 mb-1">Position</div>
+                                <input type="range" min="0" max="100" value="0" class="position-slider w-full mb-1">
+                                <div class="text-xs text-gray-500 mb-1">Opacity</div>
+                                <input type="range" min="0" max="100" value="100" class="opacity-slider w-full">
+                            </div>
+                            <div class="w-16 text-sm text-gray-600">
+                                <div class="position-display">0%</div>
+                                <div class="opacity-display text-xs">100%</div>
+                            </div>
                             <button class="remove-color ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 disabled:opacity-50" disabled>×</button>
                         </div>
                         <div class="color-stop flex items-center mb-3">
                             <input type="color" value="#0000ff" class="color-input w-12 h-12 rounded border-2 border-gray-300 cursor-pointer">
-                            <input type="range" min="0" max="100" value="100" class="position-slider flex-1 mx-3">
-                            <span class="position-display w-12 text-sm text-gray-600">100%</span>
+                            <div class="flex-1 mx-3">
+                                <div class="text-xs text-gray-500 mb-1">Position</div>
+                                <input type="range" min="0" max="100" value="100" class="position-slider w-full mb-1">
+                                <div class="text-xs text-gray-500 mb-1">Opacity</div>
+                                <input type="range" min="0" max="100" value="100" class="opacity-slider w-full">
+                            </div>
+                            <div class="w-16 text-sm text-gray-600">
+                                <div class="position-display">100%</div>
+                                <div class="opacity-display text-xs">100%</div>
+                            </div>
                             <button class="remove-color ml-2 px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">×</button>
                         </div>
                     </div>
